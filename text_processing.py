@@ -1,4 +1,5 @@
 import re
+import unicodedata
 
 def treat_data(book_f, stopwords):
     header_removed = False  # flag to track if the header has been removed
@@ -22,10 +23,11 @@ def filter_stopwords(line, stopwords):
 def capitalize_line(line):
     line = re.sub(r'[^\w\s]', '', line) # remove punctuation
     line = line.upper() # capitalize
-    return line
+    line = unicodedata.normalize('NFD', line) # normalize the line to its non-accented version
+    return ''.join(c for c in line if not unicodedata.combining(c)) # remove all accents
 
 def get_stopw_list(stopw_f):
-    stopwords = []
+    stopwords = set()
     for line in stopw_f.readlines():
-        stopwords.append(line.upper().strip())
+        stopwords.add(line.upper().strip())
     return stopwords
